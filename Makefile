@@ -31,7 +31,7 @@ puzzle.help.o: puzzle.help.cpp
 .PHONY: clean install all
 
 install:
-	mkdir ./install
+	mkdir -p ./install
 	cp $(TARGET) ./install
 	cp -r ./lib ./install
 
