@@ -6,18 +6,18 @@ Os=-O3
 std=-std=c++17
 LINK = -Wl,-L./
 SEARCH = -I./
-OBJECTS = io.o map_operation.o check.o utility.o puzzle.o defdata.o
-TARGETLIBS = libio.so libmap_operation.so libcheck.so libutility.so  libpuzzle.so libdefdata.so
+OBJECTS = keyboard.o map_operation.o check.o utility.o puzzle.o defdata.o
+TARGETLIBS = libkeyboard.so libmap_operation.so libcheck.so libutility.so  libpuzzle.so libdefdata.so
 
 all: libpuzzle.so libdefdata.so
 	@mkdir -p ../lib
-	mv $(TARGETLIBS) ../lib
+	cp $(TARGETLIBS) ../lib
 	@rm -rf ./lib
 
-libio.so : io.o
-	$(CC) -shared -o libio.so io.o
-io.o: io.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c io.cpp
+libkeyboard.so : keyboard.o
+	$(CC) -shared -o libkeyboard.so keyboard.o
+keyboard.o: keyboard.cpp
+	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c keyboard.cpp
 
 libmap_operation.so: map_operation.o
 	$(CC) -shared -o libmap_operation.so map_operation.o
@@ -29,10 +29,10 @@ libcheck.so: check.o
 check.o: check.cpp
 	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c check.cpp
 
-libutility.so: utility.o libcheck.so libio.so
+libutility.so: utility.o libcheck.so libkeyboard.so
 	@mkdir -p ./lib
-	@cp ./libio.so ./libcheck.so ./lib/
-	$(CC) -shared $(LINK) -o libutility.so utility.o ./lib/libio.so ./lib/libcheck.so
+	@cp ./libkeyboard.so ./libcheck.so ./lib/
+	$(CC) -shared $(LINK) -o libutility.so utility.o ./lib/libkeyboard.so ./lib/libcheck.so
 utility.o: utility.cpp
 	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c utility.cpp
 

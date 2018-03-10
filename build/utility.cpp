@@ -1,5 +1,5 @@
 #include"utility.h"
-#include"io.h"
+#include"keyboard.h"
 #include"check.h"
 #include<queue>
 #include<cstdio>
@@ -203,7 +203,7 @@ namespace game
       {
         reflush_screen();
         draw_solve_path(__map, __porec);
-        io::read_one_char();
+        keyboard::read_one_char();
         return;
       }
 
@@ -272,7 +272,7 @@ namespace game
       {
         reflush_screen();
         draw_solve_path(__map, __porec);
-        io::read_one_char();
+        keyboard::read_one_char();
         return;
       }
       if(__porec.size() == __res)
@@ -353,18 +353,20 @@ namespace game
     unsigned long __x, unsigned long __y
   )
   {
-    char __dir;
+    keyboard::keyboard_mapping __dir;
     base_type __tmp = puzz_write;
     while(true)
     {
       if(check_record())
       { return;}
-      __dir = io::read_one_char();
+      __dir = keyboard::keyboard_one_step();
       if(check_record())
       { return;}
       switch(__dir)
       {
-        case 'd':
+        case keyboard::keyboard_mapping::right_arrow:
+        case keyboard::keyboard_mapping::char_d:
+        case keyboard::keyboard_mapping::char_D:
           {
             std::lock_guard<std::mutex> __guard(__map->__mutex);
             __tmp = __map->__data.at(static_cast<long>(__x) + x_dic[0], static_cast<long>(__y) + y_dic[0]);
@@ -375,7 +377,9 @@ namespace game
             __y = static_cast<long>(__y) + y_dic[0];
           }
           break;
-        case 'w':
+        case keyboard::keyboard_mapping::up_arrow:
+        case keyboard::keyboard_mapping::char_w:
+        case keyboard::keyboard_mapping::char_W:
           {
             std::lock_guard<std::mutex> __guard(__map->__mutex);
             __tmp = __map->__data.at(static_cast<long>(__x) + x_dic[1], static_cast<long>(__y) + y_dic[1]);
@@ -386,7 +390,9 @@ namespace game
             __y = static_cast<long>(__y) + y_dic[1];
           }
           break;
-        case 'a':
+        case keyboard::keyboard_mapping::left_arrow:
+        case keyboard::keyboard_mapping::char_a:
+        case keyboard::keyboard_mapping::char_A:
           {
             std::lock_guard<std::mutex> __guard(__map->__mutex);
             __tmp = __map->__data.at(static_cast<long>(__x) + x_dic[2], static_cast<long>(__y) + y_dic[2]);
@@ -397,7 +403,9 @@ namespace game
             __y = static_cast<long>(__y) + y_dic[2];
           }
           break;
-        case 's':
+        case keyboard::keyboard_mapping::down_arrow:
+        case keyboard::keyboard_mapping::char_s:
+        case keyboard::keyboard_mapping::char_S:
           {
             std::lock_guard<std::mutex> __guard(__map->__mutex);
             __tmp = __map->__data.at(static_cast<long>(__x) + x_dic[3], static_cast<long>(__y) + y_dic[3]);
