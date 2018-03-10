@@ -16,19 +16,19 @@ all: libs puzzle.main puzzle.help
 libs:
 	@$(MAKE) -C ./build
 
-puzzle.main: puzzle.main.o ./lib/libio.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libpuzzle.so ./lib/libdefdata.so
-	$(CC) -o puzzle.main puzzle.main.o ./lib/libio.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libdefdata.so ./lib/libpuzzle.so
+puzzle.main: puzzle.main.o ./lib/libkeyboard.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libpuzzle.so ./lib/libdefdata.so
+	$(CC) -o puzzle.main puzzle.main.o ./lib/libkeyboard.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libdefdata.so ./lib/libpuzzle.so
 
 puzzle.main.o: puzzle.main.cpp
 	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c puzzle.main.cpp
 
-puzzle.help: puzzle.help.o ./lib/libio.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libpuzzle.so
-	$(CC) -o puzzle.help puzzle.help.o ./lib/libio.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libpuzzle.so
+puzzle.help: puzzle.help.o ./lib/libkeyboard.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libpuzzle.so
+	$(CC) -o puzzle.help puzzle.help.o ./lib/libkeyboard.so ./lib/libutility.so ./lib/libmap_operation.so ./lib/libcheck.so ./lib/libpuzzle.so
 
 puzzle.help.o: puzzle.help.cpp
 	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c puzzle.help.cpp
 
-.PHONY: clean install all
+.PHONY: chclean clean install all
 
 install:
 	mkdir -p ./install
@@ -39,5 +39,6 @@ chclean:
 	-rm $(OBJECT)
 
 clean: chclean
+	@$(MAKE) clean -C ./build
 	-rm -r ./lib
 	-rm $(TARGET)
