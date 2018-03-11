@@ -6,7 +6,7 @@ namespace game
   {
     return __step == puzz_wall  || __step == puzz_dest ||
            __step == puzz_start || __step == puzz_pass ||
-           __step == puzz_now   || __step == puzz_tran;
+           __step == puzz_tran;
   }
 
   bool check_is_passage(base_type __step) noexcept
@@ -28,7 +28,10 @@ namespace game
   { return __step == puzz_tran;}
 
   bool check_is_write_ligatures(base_type __step) noexcept
-  { return __step == puzz_start || __step == puzz_dest || __step == puzz_write;}
+  {
+    return __step == puzz_start || __step == puzz_dest ||
+           __step == puzz_write || __step == puzz_tran;
+  }
 
   bool check_map_base(const matrix<base_type>& __map) noexcept
   {
@@ -80,11 +83,15 @@ namespace game
   bool check_is_mapped_vaild(const matrix<base_type>& __map) noexcept
   { return check_map_base(__map) && check_map_wall(__map);}
 
-  bool check_mapping_vaild(const std::map<point, point>& __mapping) noexcept
+  bool check_mapping_vaild(
+    const matrix<base_type>& __map,
+    const std::map<point, point>& __mapping
+  ) noexcept
   {
     for(const std::pair<const game::point, game::point>& __tmp: __mapping)
     {
-      if(!__mapping.count(__tmp.first))
+      if(__map.at(__tmp.first.x, __tmp.first.y) != puzz_tran ||
+         !check_is_passage(__map.at(__tmp.second.x, __tmp.second.y)))
       { return false;}
     }
     return true;

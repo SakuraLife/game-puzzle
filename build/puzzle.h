@@ -29,8 +29,6 @@ namespace game
 
     public:
       puzzle();
-      // puzzle(): __data{}, __timer{}, __mapping{}, __select{-1}
-      // { }
 
     public:
       bool load_data(const char* __str);

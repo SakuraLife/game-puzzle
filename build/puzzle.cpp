@@ -28,7 +28,8 @@ namespace game
       return false;
     }
     unsigned long __r, __c;
-    fscanf(__file, "%lu%lu", &__r, &__c);
+    long long __sel;
+    fscanf(__file, "%lu%lu%lld", &__r, &__c, &__sel);
     if(__r == 0 || __c == 0)
     {
       fprintf(stderr, "The format is not vaild.\n");
@@ -39,6 +40,8 @@ namespace game
     data_type __tmp(__r, __c);
     char __s[4];
     unsigned int __hh, __mm, __ss;
+    unsigned long long __check = 0;
+    point __st, __dest;
 
     for(unsigned long __i = 0; __i != __r; ++__i)
     {
@@ -46,16 +49,30 @@ namespace game
       {
         fscanf(__file, "%s", __s);
         __tmp.at(__i, __j) = __s[0];
+        if(__s[0] == puzz_tran)
+        { ++__check;}
       }
     }
     map_init_out_wall(__tmp);
-
     fscanf(__file, "%u%u%u", &__hh, &__mm, &__ss);
 
+    std::map<point, point> __tmap;
+
+    for(unsigned long long __i = 0; __i < __check; ++__i)
+    {
+      fscanf(
+        __file, "%lu%lu%lu%lu",
+        &__st.x, &__st.y, &__dest.x, &__dest.y
+      );
+      __tmap.emplace(__st, __dest);
+    }
 
     fclose(__file);
 
-    return this->load_time(__hh, __mm, __ss) && this->load_data(__tmp);
+    return this->load_time(__hh, __mm, __ss) &&
+           this->load_data(std::move(__tmp)) &&
+           this->load_mapping(std::move(__tmap)) &&
+           this->load_select(__sel);
   }
   bool puzzle::load_data(const data_type& __file_data)
   {
@@ -83,7 +100,7 @@ namespace game
   bool puzzle::load_mapping(const std::map<point, point>& __file_data)
   {
     using std::fprintf;
-    if(!check_mapping_vaild(__file_data))
+    if(!check_mapping_vaild(this->__data, __file_data))
     {
       fprintf(stderr, "Error! The data is invaild.\n");
       return false;
@@ -94,7 +111,7 @@ namespace game
   bool puzzle::load_mapping(std::map<point, point>&& __file_data)
   {
     using std::fprintf;
-    if(!check_mapping_vaild(__file_data))
+    if(!check_mapping_vaild(this->__data, __file_data))
     {
       fprintf(stderr, "Error! The data is invaild.\n");
       return false;

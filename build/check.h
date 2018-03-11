@@ -25,7 +25,10 @@ namespace game
   bool check_map_base(const matrix<base_type>& __map) noexcept;
   bool check_map_wall(const matrix<base_type>& __map) noexcept;
   bool check_is_mapped_vaild(const matrix<base_type>& __map) noexcept;
-  bool check_mapping_vaild(const std::map<point, point>& __mapping) noexcept;
+  bool check_mapping_vaild(
+    const matrix<base_type>& __map,
+    const std::map<point, point>& __mapping
+  ) noexcept;
 }
 
 #endif // ! __PUZZLE_CHECK__
