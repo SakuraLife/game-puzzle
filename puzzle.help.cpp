@@ -11,14 +11,12 @@ namespace
     printf("#include<cassert>\n");
     printf("\n");
 
-    printf("namespace\n");
+    printf("void game::default_data(game::matrix<game::base_type> __map, long __num)\n");
     printf("{\n");
-    printf("  game::matrix<game::base_type> default_data() noexcept\n");
-    printf("  {\n");
-    printf("    game::matrix<game::base_type> use(40, 40);\n");
-    printf("    game::map_init(use);\n");
+    printf("  __map.resize(40, 40);\n");
+    printf("  game::map_init(__map);\n");
     printf("\n");
-    printf("    assert(game::check_map_wall(use) == true);\n");
+    printf("  assert(game::check_map_wall(__map) == true);\n");
     printf("\n");
 
   }
@@ -28,17 +26,19 @@ namespace
     {
       for(unsigned long __j = 1; __j+1 < __map.col(); ++__j)
       {
-        // printf("%2c", __map.at(__i, __j));
         switch(__map.at(__i, __j))
         {
           case game::puzz_wall:
-            printf("    use.at(%2lu, %2lu) = game::puzz_wall;\n", __i, __j);
+            printf("  __map.at(%2lu, %2lu) = game::puzz_wall;\n", __i, __j);
             break;
           case game::puzz_start:
-            printf("    use.at(%2lu, %2lu) = game::puzz_start;\n", __i, __j);
+            printf("  __map.at(%2lu, %2lu) = game::puzz_start;\n", __i, __j);
             break;
           case game::puzz_dest:
-            printf("    use.at(%2lu, %2lu) = game::puzz_dest;\n", __i, __j);
+            printf("  __map.at(%2lu, %2lu) = game::puzz_dest;\n", __i, __j);
+            break;
+          case game::puzz_tran:
+            printf("    use.at(%2lu, %2lu) = game::puzz_tran;\n", __i, __j);
             break;
           case game::puzz_now:
           case game::puzz_pass:
@@ -54,8 +54,7 @@ namespace
   void print_default_inc_ed() noexcept
   {
     printf("\n");
-    printf("    return use;\n");
-    printf("  }\n");
+    printf("  return;\n");
     printf("}\n");
   }
 }

@@ -4,8 +4,8 @@
 
 #include"constant.hpp"
 #include"matrix.hpp"
-#include"utility.h"
-#include"map_operation.h"
+#include"structs.hpp"
+#include<map>
 
 namespace game
 {
@@ -24,17 +24,25 @@ namespace game
     private:
       data_type __data;
       time_type __timer;
+      std::map<point, point> __mapping;
+      long long __select;
 
     public:
-      puzzle(): __data(), __timer()
-      { }
+      puzzle();
+      // puzzle(): __data{}, __timer{}, __mapping{}, __select{-1}
+      // { }
 
     public:
       bool load_data(const char* __str);
       bool load_data(const data_type& __file_data);
+      bool load_data(data_type&& __file_data);
+      bool load_mapping(const std::map<point, point>& __file_data);
+      bool load_mapping(std::map<point, point>&& __file_data);
       bool load_time(
         unsigned int __hh, unsigned int __mm, unsigned int __ss
       ) noexcept;
+      bool load_time(const countdown& __t) noexcept;
+      bool load_select(long long __at) noexcept;
 
     public:
       void game_play();

@@ -2,12 +2,18 @@
 #include"check.h"
 #include"utility.h"
 #include"map_operation.h"
+#include"solve.h"
+#include"main.h"
 #include<thread>
+#include<utility>
 #include<cstdlib>
 #include<cstdio>
 
 namespace game
 {
+  puzzle::puzzle(): __data{}, __timer{}, __mapping{}, __select{-1}
+  { }
+
   bool puzzle::load_data(const char* __str)
   {
     using std::FILE;
@@ -46,6 +52,7 @@ namespace game
 
     fscanf(__file, "%u%u%u", &__hh, &__mm, &__ss);
 
+
     fclose(__file);
 
     return this->load_time(__hh, __mm, __ss) && this->load_data(__tmp);
@@ -61,42 +68,93 @@ namespace game
     this->__data = __file_data;
     return true;
   }
+  bool puzzle::load_data(data_type&& __file_data)
+  {
+    using std::fprintf;
+    if(!check_is_mapped_vaild(__file_data))
+    {
+      fprintf(stderr, "Error! The data is invaild.\n");
+      return false;
+    }
+    this->__data = std::move(__file_data);
+    return true;
+  }
+
+  bool puzzle::load_mapping(const std::map<point, point>& __file_data)
+  {
+    using std::fprintf;
+    if(!check_mapping_vaild(__file_data))
+    {
+      fprintf(stderr, "Error! The data is invaild.\n");
+      return false;
+    }
+    this->__mapping = __file_data;
+    return true;
+  }
+  bool puzzle::load_mapping(std::map<point, point>&& __file_data)
+  {
+    using std::fprintf;
+    if(!check_mapping_vaild(__file_data))
+    {
+      fprintf(stderr, "Error! The data is invaild.\n");
+      return false;
+    }
+    this->__mapping = std::move(__file_data);
+    return true;
+  }
+
+
   bool puzzle::load_time(
     unsigned int __hh, unsigned int __mm, unsigned int __ss
   ) noexcept
   {
-    this->__timer.__hh = __hh;
-    this->__timer.__mm = __mm;
-    this->__timer.__ss = __ss;
+    this->__timer.hh = __hh;
+    this->__timer.mm = __mm;
+    this->__timer.ss = __ss;
     return true;
   }
+  bool puzzle::load_time(const countdown& __t) noexcept
+  {
+    this->__timer = __t;
+    return true;
+  }
+  bool puzzle::load_select(long long __at) noexcept
+  {
+    this->__select = __at;
+    return true;
+  }
+}
 
+namespace game
+{
   void puzzle::game_play()
   {
     using std::printf;
 
     init_record();
-    unsigned long __x, __y;
     mutex_puzz __map(this->__data);
-    time_type __clock;
-    __clock.__hh = this->__timer.__hh;
-    __clock.__mm = this->__timer.__mm;
-    __clock.__ss = this->__timer.__ss;
+    countdown_mutex __clock{this->__timer};
+    vector<point> __st_po;
 
-    if(!find_puzzle_start(__map.__data, __x, __y))
+    if(!find_puzzle_start(__map.__data, __st_po))
     {
       fprintf(stderr, "Error! Can not find start.");
       return;
     }
-    __map.__data.at(__x, __y) = puzz_now;
+    point_mutex __now;
+    select_one_start(
+      __st_po, this->__select, __now.__now.x, __now.__now.y
+    );
 
     reflush_screen();
-    draw_matrix(__map.__data);
-    printf("Please go on\n\n");
-    draw_time(__clock);
+    draw_play_matrix(__map, __now, __clock);
 
-    std::thread __thread1{_game_playing, &__clock, &__map, __x, __y};
-    std::thread __thread2{_time_opreator, &__clock, &__map};
+    // _game_playing(&__clock, &__map, &(this->__mapping), &__now);
+
+    std::thread __thread1{
+      _game_playing, &__clock, &__map, &(this->__mapping), &__now
+    };
+    std::thread __thread2{_time_opreator, &__clock, &__map, &__now};
 
     if(__thread1.joinable())
     { __thread1.join();}

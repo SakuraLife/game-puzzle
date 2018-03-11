@@ -4,6 +4,8 @@
 
 #include"constant.hpp"
 #include"matrix.hpp"
+#include"structs.hpp"
+#include<map>
 
 namespace game
 {
@@ -16,19 +18,14 @@ namespace game
     const matrix<base_type>& __map
   ) noexcept;
 
+  bool check_is_transport(base_type __step) noexcept;
+
   bool check_is_write_ligatures(base_type __step) noexcept;
 
   bool check_map_base(const matrix<base_type>& __map) noexcept;
-
   bool check_map_wall(const matrix<base_type>& __map) noexcept;
-
-  bool find_puzzle_start(
-    const matrix<base_type>& __map,
-    unsigned long& __x, unsigned long& __y
-  ) noexcept;
-
   bool check_is_mapped_vaild(const matrix<base_type>& __map) noexcept;
-
+  bool check_mapping_vaild(const std::map<point, point>& __mapping) noexcept;
 }
 
 #endif // ! __PUZZLE_CHECK__

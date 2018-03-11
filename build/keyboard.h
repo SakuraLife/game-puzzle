@@ -1,6 +1,6 @@
 
-#ifndef __PUZZLE_IO__
-#define __PUZZLE_IO__
+#ifndef __PUZZLE_KEYBOARD__
+#define __PUZZLE_KEYBOARD__
 
 namespace keyboard
 {
@@ -123,4 +123,4 @@ namespace keyboard
   keyboard_mapping keyboard_one_step() noexcept;
 }
 
-#endif // ! __PUZZLE_IO__
+#endif // ! __PUZZLE_KEYBOARD__

@@ -6,53 +6,48 @@ Os=-O3
 std=-std=c++17
 LINK = -Wl,-L./
 SEARCH = -I./
-OBJECTS = keyboard.o map_operation.o check.o utility.o puzzle.o defdata.o
-TARGETLIBS = libkeyboard.so libmap_operation.so libcheck.so libutility.so  libpuzzle.so libdefdata.so
+SOURCE := $(wildcard *.cpp)
+OBJECTS := $(foreach tmp,$(SOURCE),$(subst .cpp,.o,$(tmp)))
+DEPENDS := $(foreach tmp,$(SOURCE),$(subst .cpp,.d,$(tmp)))
+TARGETLIBS := $(foreach tmp,$(SOURCE),$(addprefix lib, $(subst .cpp,.so,$(tmp))))
+DEFDATADEPEND := $(foreach tmp,$(wildcard ../build_in/*.cpp),$(addprefix ./buildin/lib, $(subst ../build_in/,, $(subst .cpp,.so,$(tmp)))))
 
-all: libpuzzle.so libdefdata.so
-	@mkdir -p ../lib
-	cp $(TARGETLIBS) ../lib
-	@rm -rf ./lib
+all: $(TARGETLIBS)
 
-libkeyboard.so : keyboard.o
-	$(CC) -shared -o libkeyboard.so keyboard.o
-keyboard.o: keyboard.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c keyboard.cpp
+libkeyboard.so libcheck.so libmap_operation.so libutility.so: lib%.so: %.o
+	$(CC) -shared -o $@ $<
 
-libmap_operation.so: map_operation.o
-	$(CC) -shared -o libmap_operation.so map_operation.o
-map_operation.o: map_operation.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c map_operation.cpp
-
-libcheck.so: check.o
-	$(CC) -shared -o libcheck.so check.o
-check.o: check.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c check.cpp
-
-libutility.so: utility.o libcheck.so libkeyboard.so
+libpuzzle.so: puzzle.o libutility.so libcheck.so libmap_operation.so libsolve.so libmain.so
 	@mkdir -p ./lib
-	@cp ./libkeyboard.so ./libcheck.so ./lib/
-	$(CC) -shared $(LINK) -o libutility.so utility.o ./lib/libkeyboard.so ./lib/libcheck.so
-utility.o: utility.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c utility.cpp
+	@ln -rsf -t ./lib ./libmap_operation.so ./libcheck.so ./libmain.so ./libutility.so ./libsolve.so
+	$(CC) -shared $(LINK) -o libpuzzle.so puzzle.o ./lib/libutility.so ./lib/libcheck.so ./lib/libmap_operation.so ./lib/libsolve.so ./lib/libmain.so -lpthread
 
-libpuzzle.so: puzzle.o libutility.so libcheck.so libmap_operation.so
+libdefdata.so: defdata.o
+	@mkdir -p ./buildin
+	@ln -rsf -t ./buildin ../build_in/*.so
+	$(CC) -shared $(LINK) -o libdefdata.so defdata.o $(DEFDATADEPEND)
+
+libmain.so libsolve.so: lib%.so: %.o libutility.so libkeyboard.so libcheck.so
 	@mkdir -p ./lib
-	@cp ./libutility.so ./libmap_operation.so ./libcheck.so ./lib/
-	$(CC) -shared $(LINK) -o libpuzzle.so puzzle.o ./lib/libutility.so ./lib/libcheck.so ./lib/libmap_operation.so -lpthread
-puzzle.o: puzzle.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c puzzle.cpp
+	@ln -rsf -t ./lib ./libkeyboard.so ./libcheck.so ./libutility.so
+	$(CC) -shared $(LINK) -o $@ $< ./lib/libkeyboard.so ./lib/libcheck.so ./lib/libutility.so
 
-libdefdata.so: defdata.o libcheck.so libmap_operation.so
-	@mkdir -p ./lib
-	@cp ./libutility.so ./libmap_operation.so ./lib/
-	$(CC) -shared $(LINK) -o libdefdata.so defdata.o ./lib/libcheck.so ./lib/libmap_operation.so
+%.d: %.cpp
+	@set -e; rm -f $@; \
+	$(CC) -M $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	echo -e "\t$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c $<" >> $@; \
+	rm -f $@.$$$$
 
-defdata.o: defdata.cpp
-	$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c defdata.cpp
+include $(DEPENDS)
 
 .PHONY: chclean clean all
+
+chclean:
+	-rm -r ./lib
+	-rm -r ./buildin
+	-rm $(OBJECTS)
+
 clean: chclean
 	-rm $(TARGETLIBS)
-chclean:
-	-rm $(OBJECTS)
+	-rm $(DEPENDS)

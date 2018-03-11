@@ -6,11 +6,14 @@ namespace game
   {
     return __step == puzz_wall  || __step == puzz_dest ||
            __step == puzz_start || __step == puzz_pass ||
-           __step == puzz_now;
+           __step == puzz_now   || __step == puzz_tran;
   }
 
   bool check_is_passage(base_type __step) noexcept
-  { return __step == puzz_start || __step == puzz_pass || __step == puzz_dest;}
+  {
+    return __step == puzz_start || __step == puzz_pass ||
+           __step == puzz_dest  || __step == puzz_tran;
+  }
 
   bool check_not_out(
     unsigned long __row, unsigned long __col,
@@ -21,6 +24,9 @@ namespace game
            __col > 0 && __col < __map.col();
   }
 
+  bool check_is_transport(base_type __step) noexcept
+  { return __step == puzz_tran;}
+
   bool check_is_write_ligatures(base_type __step) noexcept
   { return __step == puzz_start || __step == puzz_dest || __step == puzz_write;}
 
@@ -29,7 +35,7 @@ namespace game
     const base_type* __map_end = __map.data() + __map.size();
     unsigned long long __check = 0;
 
-    // Maybe we assume more than one dest? Uhh....
+    // Maybe we assume more than one dest and one start? Uhh....
     for(const base_type* __i = __map.data(); __i != __map_end; ++__i)
     {
       if(*__i == puzz_dest)
@@ -44,7 +50,7 @@ namespace game
       if(*__i == puzz_start)
       { ++__check;}
     }
-    return __check == 1;
+    return __check != 0ULL;
   }
 
   bool check_map_wall(const matrix<base_type>& __map) noexcept
@@ -71,64 +77,17 @@ namespace game
     return true;
   }
 
-  bool find_puzzle_start(
-    const matrix<base_type>& __map,
-    unsigned long& __x, unsigned long& __y
-  ) noexcept
-  {
-    const base_type* __map_end = __map.data() + __map.size();
-
-    for(const base_type* __i = __map.data(); __i != __map_end; ++__i)
-    {
-      if(*__i == puzz_start)
-      {
-        __x = (__i - __map.data()) / __map.col();
-        __y = (__i - __map.data()) % __map.col();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  namespace __detail
-  {
-
-    bool __check_one_step(
-      const matrix<base_type>& __map, matrix<bool>& __rec,
-      unsigned long __r, unsigned long __c
-    )
-    {
-      if(__map.at(__r, __c) == puzz_dest)
-      { return true;}
-
-      for(unsigned long __i = 0; __i != 4; ++__i)
-      {
-        const long __trow = static_cast<long>(__r)+x_dic[__i];
-        const long __tcol = static_cast<long>(__c)+y_dic[__i];
-        if(check_not_out(__trow, __tcol, __map) &&
-          !__rec.at(__trow, __tcol) &&
-          check_is_passage(__map.at(__trow, __tcol))
-        )
-        {
-          __rec.at(__trow, __tcol) = true;
-          if(__check_one_step(__map, __rec, __trow, __tcol))
-          { return true;}
-          __rec.at(__trow, __tcol) = false;
-        }
-      }
-
-      return false;
-    }
-  }
-
   bool check_is_mapped_vaild(const matrix<base_type>& __map) noexcept
+  { return check_map_base(__map) && check_map_wall(__map);}
+
+  bool check_mapping_vaild(const std::map<point, point>& __mapping) noexcept
   {
-    // if(!(check_map_base(__map) && check_map_wall(__map)))
-    // { return false;}
-    // matrix<bool> __record(__map.row(), __map.col());
-    // unsigned long __x, __y;
-    // if(find_puzzle_start(__map, __x, __y))
-    // { return __detail::__check_one_step(__map, __record, __x, __y);}
-    return check_map_base(__map) && check_map_wall(__map);
+    for(const std::pair<const game::point, game::point>& __tmp: __mapping)
+    {
+      if(!__mapping.count(__tmp.first))
+      { return false;}
+    }
+    return true;
   }
+
 }

@@ -86,7 +86,7 @@ namespace game
     public:
       void resize(size_type __r, size_type __c)
       {
-        if(this->__resize(__row*__col))
+        if(this->__resize(__r*__c))
         {
           this->__row = __r;
           this->__col = __c;
