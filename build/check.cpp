@@ -6,13 +6,14 @@ namespace game
   {
     return __step == puzz_wall  || __step == puzz_dest ||
            __step == puzz_start || __step == puzz_pass ||
-           __step == puzz_tran;
+           __step == puzz_tran  || __step == puzz_trap_wall;
   }
 
   bool check_is_passage(base_type __step) noexcept
   {
     return __step == puzz_start || __step == puzz_pass ||
-           __step == puzz_dest  || __step == puzz_tran;
+           __step == puzz_dest  || __step == puzz_tran ||
+           __step == puzz_trap_wall;
   }
 
   bool check_not_out(
@@ -30,7 +31,8 @@ namespace game
   bool check_is_write_ligatures(base_type __step) noexcept
   {
     return __step == puzz_start || __step == puzz_dest ||
-           __step == puzz_write || __step == puzz_tran;
+           __step == puzz_write || __step == puzz_tran ||
+           __step == puzz_trap_wall;
   }
 
   bool check_map_base(const matrix<base_type>& __map) noexcept

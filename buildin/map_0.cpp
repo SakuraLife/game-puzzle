@@ -350,6 +350,7 @@ void game::build_in::map_0_data(matrix<game::base_type>& __map)
   __map.at(18, 34) = game::puzz_wall;
   __map.at(18, 35) = game::puzz_wall;
   __map.at(18, 36) = game::puzz_wall;
+  __map.at(18, 37) = game::puzz_trap_wall;
   __map.at(18, 38) = game::puzz_wall;
   __map.at(19,  2) = game::puzz_wall;
   __map.at(19,  7) = game::puzz_wall;
@@ -398,6 +399,7 @@ void game::build_in::map_0_data(matrix<game::base_type>& __map)
   __map.at(21, 30) = game::puzz_wall;
   __map.at(21, 31) = game::puzz_dest;
   __map.at(21, 32) = game::puzz_wall;
+  __map.at(21, 33) = game::puzz_trap_wall;
   __map.at(21, 34) = game::puzz_wall;
   __map.at(21, 35) = game::puzz_wall;
   __map.at(21, 36) = game::puzz_wall;
@@ -451,6 +453,7 @@ void game::build_in::map_0_data(matrix<game::base_type>& __map)
   __map.at(25, 30) = game::puzz_wall;
   __map.at(25, 32) = game::puzz_wall;
   __map.at(25, 33) = game::puzz_wall;
+  __map.at(25, 34) = game::puzz_trap_wall;
   __map.at(25, 35) = game::puzz_wall;
   __map.at(25, 37) = game::puzz_wall;
   __map.at(26,  2) = game::puzz_wall;
@@ -530,6 +533,7 @@ void game::build_in::map_0_data(matrix<game::base_type>& __map)
   __map.at(31, 16) = game::puzz_wall;
   __map.at(31, 25) = game::puzz_wall;
   __map.at(31, 35) = game::puzz_wall;
+  __map.at(31, 37) = game::puzz_trap_wall;
   __map.at(32,  2) = game::puzz_wall;
   __map.at(32,  4) = game::puzz_wall;
   __map.at(32,  6) = game::puzz_wall;

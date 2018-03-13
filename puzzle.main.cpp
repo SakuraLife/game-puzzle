@@ -134,5 +134,8 @@ int main(int argc, char* argv[])
   )
   { puzz.game_play();}
 
+  // if(puzz.load_data(argv[1]))
+  // { puzz.game_play();}
+
   return 0;
 }

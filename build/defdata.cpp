@@ -1,5 +1,5 @@
 #include"defdata.h"
-#include"../build_in/build_in.hpp"
+#include"../buildin/build_in.hpp"
 
 void game::build_in_data(matrix<base_type>& __map, long __num)
 {

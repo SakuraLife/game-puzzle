@@ -1,10 +1,10 @@
 CC=g++
-WARNINGS = -Wall -Warray-bounds -Wcast-align -Wfloat-equal -Wfloat-conversion -Winit-self -Winline -Wlogical-op -Wunused -Wmain -Wold-style-cast -Wreturn-type -Wshadow -Wtype-limits
+WARNINGS = -Wall -Warray-bounds -Wcast-align -Wfloat-equal -Wfloat-conversion -Winit-self -Winline -Wlogical-op -Wunused -Wmain -Wold-style-cast -Wreturn-type -Wshadow -Wtype-limits -Wsign-conversion
 FPIC=-fpic
 Os=-O3
 std=-std=c++17
 LINK = -Wl,-L./
-SEARCH = -I./
+LIBSEARCH = -L./ -L../build
 SOURCE := $(wildcard *.cpp)
 OBJECTS := $(foreach tmp,$(SOURCE),$(subst .cpp,.o,$(tmp)))
 DEPENDS := $(foreach tmp,$(SOURCE),$(subst .cpp,.d,$(tmp)))
@@ -19,16 +19,14 @@ all: pre $(TARGET)
 	@set -e; rm -f $@; \
 	$(CC) -M $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	echo -e "\t$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) $(LINK) -c $<" >> $@; \
+	echo -e "\t$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) -c $<" >> $@; \
 	rm -f $@.$$$$
 
 pre:
-	@$(MAKE) libmap_operation.so -C ../build
-	@mkdir -p ./lib
-	@ln -rsf -t ./lib ../build/libmap_operation.so
+	@$(MAKE) -C ../build libmap_operation.so
 
 $(TARGET): lib%.so: %.o
-	$(CC) -shared -o $@ $< ./lib/libmap_operation.so
+	$(CC) $(LIBSEARCH) -shared -o $@ $< -lmap_operation
 
 include $(DEPENDS)
 
@@ -36,7 +34,8 @@ include $(DEPENDS)
 
 chclean:
 	-rm $(OBJECTS)
+	-rm -r ./libpuzzle
 	-rm $(DEPENDS)
+
 clean: chclean
 	-rm $(TARGET)
-	-rm -r ./lib

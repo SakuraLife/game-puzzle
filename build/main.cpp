@@ -116,6 +116,8 @@ namespace game
 
     draw_time(__timer.__time);
 
+    printf("\nNow position:(%4lu, %4lu)\n", __now.__now.x, __now.__now.y);
+
   }
 }
 

@@ -19,6 +19,7 @@ namespace game
       {
         switch(__map.at(__i, __j))
         {
+          case puzz_trap_wall:
           case puzz_wall:
             printf(" #");
             break;
@@ -31,6 +32,7 @@ namespace game
           case puzz_dest:
             printf(" \e[1;31m1\e[0m");
             break;
+          case puzz_trap_pass:
           case puzz_pass:
             printf(" \e[1;30m-\e[0m");
             break;
