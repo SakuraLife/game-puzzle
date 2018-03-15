@@ -48,6 +48,48 @@ namespace game
     }
   }
 
+  void draw_matrix(
+    const matrix<base_type>& __map,
+    const unsigned long __up, const unsigned long __down,
+    const unsigned long __left, const unsigned long __right
+  ) noexcept
+  {
+    using std::printf;
+    for(unsigned long __i = __up; __i != __down; ++__i)
+    {
+      for(unsigned long __j = __left; __j != __right; ++__j)
+      {
+        switch(__map.at(__i, __j))
+        {
+          case puzz_trap_wall:
+          case puzz_wall:
+            printf(" #");
+            break;
+          case puzz_now:
+            printf(" \e[1;36m@\e[0m");
+            break;
+          case puzz_start:
+            printf(" \e[1;31m0\e[0m");
+            break;
+          case puzz_dest:
+            printf(" \e[1;31m1\e[0m");
+            break;
+          case puzz_trap_pass:
+          case puzz_pass:
+            printf(" \e[1;30m-\e[0m");
+            break;
+          case puzz_write:
+            printf(" \e[1;33mx\e[0m");
+            break;
+          case puzz_tran:
+            printf(" \e[1;35m+\e[0m");
+            break;
+        }
+      }
+      printf("\n");
+    }
+  }
+
   void draw_time(const countdown& __timer) noexcept
   {
     printf(

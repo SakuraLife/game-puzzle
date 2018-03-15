@@ -13,6 +13,8 @@ namespace game
 {
   puzzle::puzzle(): __data{}, __timer{}, __mapping{}, __select{-1}
   { }
+  puzzle::~puzzle()
+  { }
 
   bool puzzle::load_data(const char* __str)
   {
@@ -149,6 +151,7 @@ namespace game
     using std::printf;
 
     init_record();
+
     mutex_puzz __map(this->__data);
     countdown_mutex __clock{this->__timer};
     vector<point> __st_po;
@@ -160,16 +163,23 @@ namespace game
     }
     point_mutex __now;
     select_one_start(
-      __st_po, this->__select, __now.__now.x, __now.__now.y
+      __st_po, this->__select, __now.__pos.x, __now.__pos.y
     );
 
+    init_position(__map.__data, __now);
     reflush_screen();
     draw_play_matrix(__map, __now, __clock);
 
-    // _game_playing(&__clock, &__map, &(this->__mapping), &__now);
+    // _game_playing(
+    //   &__clock, &__map, &(this->__mapping), &__now,
+      // __now.__pos.__up != 0U || __now.__pos.__down != __map.__data.row(),
+      // __now.__pos.__left != 0U || __now.__pos.__right != __map.__data.col()
+    // );
 
     std::thread __thread1{
-      _game_playing, &__clock, &__map, &(this->__mapping), &__now
+      _game_playing, &__clock, &__map, &(this->__mapping), &__now,
+      __now.__pos.__up != 0U || __now.__pos.__down != __map.__data.row(),
+      __now.__pos.__left != 0U || __now.__pos.__right != __map.__data.col()
     };
     std::thread __thread2{_time_opreator, &__clock, &__map, &__now};
 
@@ -188,7 +198,7 @@ namespace game
     draw_matrix(this->__data);
     printf("\n");
 
-    bool __res = find_all_shortest_path(this->__data);
+    bool __res = find_all_shortest_path(this->__data, this->__mapping);
     if(!__res)
     {
       printf("There is no path for the game.\n");
@@ -204,7 +214,7 @@ namespace game
     draw_matrix(this->__data);
     printf("\n");
 
-    bool __res = find_all_path(this->__data);
+    bool __res = find_all_path(this->__data, this->__mapping);
     if(!__res)
     {
       printf("There is no path for the game.\n");
@@ -212,8 +222,14 @@ namespace game
     }
   }
 
-  const puzzle::data_type& puzzle::data() const noexcept
+  const puzzle::data_type& puzzle::map_data() const noexcept
   { return this->__data;}
+  const puzzle::time_type& puzzle::time_data() const noexcept
+  { return this->__timer;}
+  const std::map<point, point>& puzzle::mapping_data() const noexcept
+  { return this->__mapping;}
+  long long puzzle::select_type_data() const noexcept
+  { return this->__select;}
 
   void puzzle::game_edit(const char* __path)
   {

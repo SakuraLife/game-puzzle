@@ -3,19 +3,28 @@ CC=g++
 WARNINGS = -Wall -Warray-bounds -Wcast-align -Wfloat-equal -Wfloat-conversion -Winit-self -Winline -Wlogical-op -Wunused -Wmain -Wold-style-cast -Wreturn-type -Wshadow -Wtype-limits -Wsign-conversion
 FPIC=-fpic
 Os=-O3
-std=-std=c++17
+std=-std=c++14
 LINK = -Wl,-rpath,'$$ORIGIN/libpuzzle/:$$ORIGIN/libpuzzle/maps:libpuzzle/:libpuzzle/maps'
 LIBSEARCH = -L./buildin -L./build
 # LINK = -Wl,-l,.
 SEARCH = -Wl,-rpath,'$$ORIGIN'
-OBJECT := puzzle.help.o puzzle.main.o
-TARGET := puzzle.help puzzle.main
-DEPENDS := puzzle.help.d puzzle.main.d
+OBJECT := puzzle.gen.o puzzle.main.o
+TARGET := puzzle.gen puzzle.main
+DEPENDS := puzzle.gen.d puzzle.main.d
 DEFDATADEPEND := $(foreach tmp,$(wildcard ./buildin/*.cpp),$(addprefix -l, $(subst ./buildin/,, $(subst .cpp,,$(tmp)))))
+NDEBUG =
+ifndef DESTDIR
+	DESTDIR := ./install
+endif
+ifdef DEBUG
+	NDEBUG := 0
+else
+	NDEBUG := 1
+endif
 
-unexport
+export NDEBUG
 
-all: build_in_map libs puzzle.main puzzle.help
+all: build_in_map libs puzzle.main puzzle.gen
 
 build_in_map:
 	@$(MAKE) -C ./buildin
@@ -30,8 +39,8 @@ libs: build_in_map
 puzzle.main: puzzle.main.o libs build_in_map
 	$(CC) $(LIBSEARCH) $(LINK) -o puzzle.main puzzle.main.o -lpuzzle -ldefdata
 
-puzzle.help: puzzle.help.o libs
-	$(CC) $(LIBSEARCH) $(LINK) -o puzzle.help puzzle.help.o -lpuzzle
+puzzle.gen: puzzle.gen.o libs
+	$(CC) $(LIBSEARCH) $(LINK) -o puzzle.gen puzzle.gen.o -lpuzzle
 
 %.d: %.cpp
 	@set -e; rm -f $@; \
@@ -45,12 +54,12 @@ include $(DEPENDS)
 .PHONY: chclean clean install all build_in_map libs
 
 install:
-	mkdir -p install
-	mkdir -p install/libpuzzle
-	mkdir -p install/libpuzzle/maps
-	cp $(TARGET) ./install
-	cp ./build/*.so ./install/libpuzzle
-	cp ./buildin/*.so ./install/libpuzzle/maps
+	mkdir -p "${DESTDIR}"
+	mkdir -p "${DESTDIR}/libpuzzle"
+	mkdir -p "${DESTDIR}/libpuzzle/maps"
+	cp $(TARGET) "${DESTDIR}"
+	cp ./build/*.so "${DESTDIR}/libpuzzle"
+	cp ./buildin/*.so "${DESTDIR}/libpuzzle/maps"
 
 chclean:
 	@$(MAKE) -C ./build chclean

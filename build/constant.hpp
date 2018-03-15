@@ -12,7 +12,7 @@ namespace game
   constexpr base_type puzz_pass       = '-';
   constexpr base_type puzz_now        = '@';
   constexpr base_type puzz_write      = 'x';
-  constexpr base_type puzz_tran       = '*';
+  constexpr base_type puzz_tran       = '+';
   constexpr base_type puzz_cost       = '$';
   constexpr base_type puzz_trap_wall  = '|';
   constexpr base_type puzz_trap_tran  = '*';

@@ -29,6 +29,7 @@ namespace game
 
     public:
       puzzle();
+      ~puzzle();
 
     public:
       bool load_data(const char* __str);
@@ -48,7 +49,10 @@ namespace game
       void game_solve_all();
 
     public:
-      const data_type& data() const noexcept;
+      const data_type& map_data() const noexcept;
+      const time_type& time_data() const noexcept;
+      const std::map<point, point>& mapping_data() const noexcept;
+      long long select_type_data() const noexcept;
 
     public:
       static void game_edit(const char* __path);

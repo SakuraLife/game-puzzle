@@ -2,7 +2,7 @@ CC=g++
 WARNINGS = -Wall -Warray-bounds -Wcast-align -Wfloat-equal -Wfloat-conversion -Winit-self -Winline -Wlogical-op -Wunused -Wmain -Wold-style-cast -Wreturn-type -Wshadow -Wtype-limits -Wsign-conversion
 FPIC=-fpic
 Os=-O3
-std=-std=c++17
+std=-std=c++14
 LINK = -Wl,-L./
 LIBSEARCH = -L./ -L../build
 SOURCE := $(wildcard *.cpp)

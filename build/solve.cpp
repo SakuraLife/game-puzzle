@@ -48,12 +48,16 @@ namespace game
           if(check_not_out(__trow, __tcol, __map) &&
             check_is_passage(__map.at(__trow, __tcol)))
           {
-            if((__filled.at(__trow, __tcol) == -1 ||
-             __filled.at(__trow, __tcol) > __now.__step+1))
+            if(check_is_transport(__map.at(__trow, __tcol)))
             {
-              __queue.push(__point{__trow, __tcol, __now.__step+1});
-              __filled.at(__trow, __tcol) = __now.__step+1;
+              ;
             }
+            // if((__filled.at(__trow, __tcol) == -1 ||
+            //  __filled.at(__trow, __tcol) > __now.__step+1))
+            // {
+            //   __queue.push(__point{__trow, __tcol, __now.__step+1});
+            //   __filled.at(__trow, __tcol) = __now.__step+1;
+            // }
           }
         }
 
@@ -117,7 +121,10 @@ namespace game
     }
   }
 
-  bool find_all_path(const matrix<base_type>& __map)
+  bool find_all_path(
+    const matrix<base_type>& __map,
+    const std::map<point, point>& __mapping
+  )
   {
     vector<point> __rec;
     if(!find_puzzle_start(__map, __rec))
@@ -147,7 +154,10 @@ namespace game
     return __sum;
   }
 
-  bool find_all_shortest_path(const matrix<base_type>& __map)
+  bool find_all_shortest_path(
+    const matrix<base_type>& __map,
+    const std::map<point, point>& __mapping
+  )
   {
     vector<point> __rec;
     if(!find_puzzle_start(__map, __rec))

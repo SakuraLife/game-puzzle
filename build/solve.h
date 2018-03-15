@@ -4,11 +4,19 @@
 
 #include"constant.hpp"
 #include"matrix.hpp"
+#include"structs.hpp"
+#include<map>
 
 namespace game
 {
-  bool find_all_path(const matrix<base_type>& __map);
-  bool find_all_shortest_path(const matrix<base_type>& __map);
+  bool find_all_path(
+    const matrix<base_type>& __map,
+    const std::map<point, point>& __mapping
+  );
+  bool find_all_shortest_path(
+    const matrix<base_type>& __map,
+    const std::map<point, point>& __mapping
+  );
 }
 
 #endif // ! __PUZZLE_SOLVE__

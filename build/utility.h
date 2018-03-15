@@ -12,6 +12,12 @@ namespace game
   void reflush_screen() noexcept;
 
   void draw_matrix(const matrix<base_type>& __map) noexcept;
+  void draw_matrix(
+    const matrix<base_type>& __map,
+    const unsigned long __up, const unsigned long __down,
+    const unsigned long __left, const unsigned long __right
+  ) noexcept;
+
   void draw_time(const countdown& __timer) noexcept;
 
   bool find_puzzle_start(

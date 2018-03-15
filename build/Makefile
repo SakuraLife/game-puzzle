@@ -3,7 +3,7 @@ CC=g++
 WARNINGS = -Wall -Warray-bounds -Wcast-align -Wfloat-equal -Wfloat-conversion -Winit-self -Winline -Wlogical-op -Wunused -Wmain -Wold-style-cast -Wreturn-type -Wshadow -Wtype-limits -Wsign-conversion
 FPIC=-fpic
 Os=-O3
-std=-std=c++17
+std=-std=c++14
 LIBSEARCH = -L./ -L../buildin
 SEARCH = -I./
 SOURCE := $(wildcard *.cpp)
@@ -11,6 +11,12 @@ OBJECTS := $(foreach tmp,$(SOURCE),$(subst .cpp,.o,$(tmp)))
 DEPENDS := $(foreach tmp,$(SOURCE),$(subst .cpp,.d,$(tmp)))
 TARGETLIBS := $(foreach tmp,$(SOURCE),$(addprefix lib, $(subst .cpp,.so,$(tmp))))
 DEFDATADEPEND := $(foreach tmp,$(wildcard ../buildin/*.cpp),$(addprefix -l, $(subst ../buildin/,, $(subst .cpp,,$(tmp)))))
+DEBUGARG =
+
+ifeq ($(NDEBUG),1)
+	DEBUGARG += -DNDEBUG
+endif
+
 
 all: $(TARGETLIBS)
 
@@ -33,7 +39,7 @@ libmain.so libsolve.so: lib%.so: %.o libutility.so libkeyboard.so libcheck.so
 	@set -e; rm -f $@; \
 	$(CC) -M $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	echo -e "\t$(CC) $(WARNINGS) $(FPIC) $(Os) $(std) -c $<" >> $@; \
+	echo -e "\t$(CC) $(WARNINGS) $(FPIC) $(Os) $(DEBUGARG) $(std) -c $<" >> $@; \
 	rm -f $@.$$$$
 
 include $(DEPENDS)

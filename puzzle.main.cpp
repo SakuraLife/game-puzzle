@@ -11,8 +11,8 @@
 // #include"./build/puzzle.h"
 // #include"./build/solve.h"
 // #include"./build/utility.h"
-// #include"./build_in/map_0.h"
-// #include"./build_in/map_1.h"
+// #include"./buildin/map_0.h"
+// #include"./buildin/map_1.h"
 
 // #include"./build/check.cpp"
 // #include"./build/defdata.cpp"
@@ -22,8 +22,8 @@
 // #include"./build/puzzle.cpp"
 // #include"./build/solve.cpp"
 // #include"./build/utility.cpp"
-// #include"./build_in/map_0.cpp"
-// #include"./build_in/map_1.cpp"
+// #include"./buildin/map_0.cpp"
+// #include"./buildin/map_1.cpp"
 
 // namespace
 // {
@@ -47,6 +47,19 @@
 
 //     printf("Created by Inochi Amaoto.\n");
 //   }
+
+  // void puzz_information() noexcept
+  // {
+  //   using std::printf;
+
+  //   printf("This is the symbol information.\n");
+
+  //   printf("  0\t\tthe start postion.\n  \t\tThe game starts from one of them.\n\n");
+  //   printf("  1\t\tthe destination postion.\n  \t\tThe game ends if you reach one of them.\n\n");
+  //   printf("  #\t\tthe wall.\n  \t\tYou can't pass it at the most time, \n  \t\tbut there are some special walls that you can pass\n\n");
+  //   printf("  -\t\tthe pass.\n  \t\tYou can pass it at the most time,\n  \t\tbut if it's a trap, you can't pass it.\n\n");
+  //   printf("  +\t\tthe transport postion.\n  \t\tYou will be transported to a new postion when you reach.\n");
+  // }
 
 // }
 
@@ -121,9 +134,9 @@ int main(int argc, char* argv[])
   std::vector<game::point> __po;
   game::matrix<game::base_type> __map;
   std::map<game::point, game::point> __mapping;
-  game::build_in_data(__map, 0);
-  game::build_in_mapping(__mapping, 0);
-  game::countdown __time = game::build_in_time(0);
+  game::build_in_data(__map, 1);
+  game::build_in_mapping(__mapping, 1);
+  game::countdown __time = game::build_in_time(1);
   game::puzzle puzz;
 
   if(
@@ -131,11 +144,9 @@ int main(int argc, char* argv[])
     puzz.load_time(__time) &&
     puzz.load_mapping(std::move(__mapping)) &&
     puzz.load_select(-1)
+    // puzz.load_data("/home/inochi/codes/vscode/Cpp/game-puzzle/output.map")
   )
   { puzz.game_play();}
-
-  // if(puzz.load_data(argv[1]))
-  // { puzz.game_play();}
 
   return 0;
 }

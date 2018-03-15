@@ -75,6 +75,11 @@ namespace game
       const value_type* data() const noexcept
       { return this->__data.data();}
 
+    public:
+      reference operator[](size_type __pos) noexcept
+      { return this->__data.operator[](__pos);}
+      const_reference operator[](size_type __pos) const noexcept
+      { return this->__data.operator[](__pos);}
 
     public:
       void init(const value_type& __value = value_type())
