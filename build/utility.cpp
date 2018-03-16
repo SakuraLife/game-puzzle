@@ -1,6 +1,7 @@
 #include"utility.h"
 #include<cstdio>
 #include<cstdlib>
+#include<ctime>
 
 namespace game
 {
@@ -11,42 +12,7 @@ namespace game
   }
 
   void draw_matrix(const matrix<base_type>& __map) noexcept
-  {
-    using std::printf;
-    for(unsigned long __i = 0; __i != __map.row(); ++__i)
-    {
-      for(unsigned long __j = 0; __j != __map.col(); ++__j)
-      {
-        switch(__map.at(__i, __j))
-        {
-          case puzz_trap_wall:
-          case puzz_wall:
-            printf(" #");
-            break;
-          case puzz_now:
-            printf(" \e[1;36m@\e[0m");
-            break;
-          case puzz_start:
-            printf(" \e[1;31m0\e[0m");
-            break;
-          case puzz_dest:
-            printf(" \e[1;31m1\e[0m");
-            break;
-          case puzz_trap_pass:
-          case puzz_pass:
-            printf(" \e[1;30m-\e[0m");
-            break;
-          case puzz_write:
-            printf(" \e[1;33mx\e[0m");
-            break;
-          case puzz_tran:
-            printf(" \e[1;35m+\e[0m");
-            break;
-        }
-      }
-      printf("\n");
-    }
-  }
+  { draw_matrix(__map, 0, __map.row(), 0, __map.col());}
 
   void draw_matrix(
     const matrix<base_type>& __map,
@@ -125,6 +91,7 @@ namespace game
     unsigned long& __x, unsigned long& __y
   ) noexcept
   {
+    srand(time(nullptr));
     unsigned long long __where = 0;
     if(__at < 0)
     { __where = rand();}

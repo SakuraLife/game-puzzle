@@ -5,6 +5,7 @@
 #include"constant.hpp"
 #include"matrix.hpp"
 #include"structs.hpp"
+#include"keyboard.h"
 #include<map>
 
 namespace game

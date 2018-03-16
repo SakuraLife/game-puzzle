@@ -63,7 +63,7 @@ namespace game
   void init_record() noexcept;
   void init_position(
     const matrix<base_type>& __map,
-    point_mutex& __now
+    game_postion& __now
   ) noexcept;
 
   void draw_play_matrix(
@@ -88,6 +88,11 @@ namespace game
     point_mutex* __now
   );
 
+  void show_puzzle_trace(
+    matrix<base_type>& __map, game_postion& __pos,
+    const std::map<point, point>& __mapping,
+    const vector<keyboard::keyboard_mapping>& __po
+  ) noexcept;
 }
 
 #endif // ! __PUZZLE_MAIN_PROCESS__

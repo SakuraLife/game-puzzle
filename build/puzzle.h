@@ -32,7 +32,7 @@ namespace game
       ~puzzle();
 
     public:
-      bool load_data(const char* __str);
+      bool load_file(const char* __str);
       bool load_data(const data_type& __file_data);
       bool load_data(data_type&& __file_data);
       bool load_mapping(const std::map<point, point>& __file_data);
@@ -44,9 +44,10 @@ namespace game
       bool load_select(long long __at) noexcept;
 
     public:
-      void game_play();
-      void game_solve();
-      void game_solve_all();
+      void game_play() const;
+      void game_solve() const;
+      void game_solve_all() const;
+      void game_show(const char* __fname);
 
     public:
       const data_type& map_data() const noexcept;

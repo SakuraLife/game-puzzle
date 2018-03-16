@@ -45,7 +45,7 @@ namespace game
 
 namespace game
 {
-  static void init_position(
+  void init_position(
     const matrix<base_type>& __map, game_postion& __pos
   ) noexcept
   {
@@ -103,15 +103,6 @@ namespace game
       __pos.__right = __map.col();
     }
 
-    return;
-  }
-
-  void init_position(
-    const matrix<base_type>& __map,
-    point_mutex& __now
-  ) noexcept
-  {
-    init_position(__map, __now.__pos);
     return;
   }
 
@@ -325,37 +316,7 @@ namespace game
     std::lock_guard<std::mutex> __guard(__map.__mutex);
     std::lock_guard<std::mutex> __now_guard(__now.__mutex);
 
-    return __map.__data.at(__now.__pos.x, __now.__pos.y) == puzz_dest;
-  }
-
-  void _time_opreator(
-    countdown_mutex* __timer, mutex_puzz* __map,
-    point_mutex* __now
-  )
-  {
-    using std::exit;
-    using std::printf;
-
-    for(; __timer->__time.hh || __timer->__time.mm || __timer->__time.ss;)
-    {
-      if(check_record())
-      { return;}
-      _forward(*__timer);
-      if(check_record())
-      { return;}
-      _decrease_time(*__timer);
-      if(check_record())
-      { return;}
-      draw_play_matrix(*__map, *__now, *__timer);
-      if(check_record())
-      { return;}
-    }
-    if(check_record())
-    { return;}
-    time_out();
-    draw_play_matrix(*__map, *__now);
-    printf("Time out\n");
-    exit(EXIT_SUCCESS);
+    return check_is_dest(__map.__data.at(__now.__pos.x, __now.__pos.y));
   }
 
   void _game_playing(
@@ -389,4 +350,92 @@ namespace game
     }
   }
 
+}
+
+namespace game
+{
+
+  void _time_opreator(
+    countdown_mutex* __timer, mutex_puzz* __map,
+    point_mutex* __now
+  )
+  {
+    using std::exit;
+    using std::printf;
+
+    for(; __timer->__time.hh || __timer->__time.mm || __timer->__time.ss;)
+    {
+      if(check_record())
+      { return;}
+      _forward(*__timer);
+      if(check_record())
+      { return;}
+      _decrease_time(*__timer);
+      if(check_record())
+      { return;}
+      draw_play_matrix(*__map, *__now, *__timer);
+      if(check_record())
+      { return;}
+    }
+    if(check_record())
+    { return;}
+    time_out();
+    draw_play_matrix(*__map, *__now);
+    printf("Time out\n");
+    exit(EXIT_SUCCESS);
+  }
+
+}
+
+namespace game
+{
+  static void delay(std::clock_t times) noexcept
+  {
+    using std::clock_t;
+    using std::clock;
+    for(clock_t __now = clock(); clock() - __now < times;)
+    { }
+  }
+  void show_puzzle_trace(
+    matrix<base_type>& __map, game_postion& __pos,
+    const std::map<point, point>& __mapping,
+    const vector<keyboard::keyboard_mapping>& __po
+  ) noexcept
+  {
+    using std::time_t;
+    using std::time;
+
+    init_position(__map, __pos);
+
+    auto __use = [&__map, &__pos]()->void{
+      reflush_screen();
+      char __tmp = __map.at(__pos.x, __pos.y);
+      __map.at(__pos.x, __pos.y) = puzz_now;
+      draw_matrix(
+        __map, __pos.__up, __pos.__down, __pos.__left, __pos.__right
+      );
+      __map.at(__pos.x, __pos.y) = __tmp;
+
+#ifndef NDEBUG
+      printf("\nNow position:(%4lu, %4lu)\n", __pos.x, __pos.y);
+      printf("\nNow draw position:\n");
+      printf("UP:\t%4lu\n", __pos.__up);
+      printf("DOWN:\t%4lu\n", __pos.__down);
+      printf("LEFT:\t%4lu\n", __pos.__left);
+      printf("RIGHT:\t%4lu\n", __pos.__right);
+#endif // ! NDEBUG
+
+      delay(CLOCKS_PER_SEC / 10 * 3);
+      return;
+    };
+
+    __use();
+    const bool __row = __pos.__up != 0 || __pos.__down != __map.row();
+    const bool __col =  __pos.__left != 0 || __pos.__right != __map.col();
+    for(const keyboard::keyboard_mapping& __dir: __po)
+    {
+      move_one_step(__map, __pos, __row, __col, __mapping, __dir);
+      __use();
+    }
+  }
 }

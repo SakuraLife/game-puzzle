@@ -10,6 +10,7 @@
 // #include"./build/map_operation.h"
 // #include"./build/puzzle.h"
 // #include"./build/solve.h"
+// #include"./build/analyze.h"
 // #include"./build/utility.h"
 // #include"./buildin/map_0.h"
 // #include"./buildin/map_1.h"
@@ -21,6 +22,7 @@
 // #include"./build/map_operation.cpp"
 // #include"./build/puzzle.cpp"
 // #include"./build/solve.cpp"
+// #include"./build/analyze.cpp"
 // #include"./build/utility.cpp"
 // #include"./buildin/map_0.cpp"
 // #include"./buildin/map_1.cpp"
@@ -131,22 +133,22 @@ int main(int argc, char* argv[])
   //     goto help_error;
   // }
 
-  std::vector<game::point> __po;
-  game::matrix<game::base_type> __map;
-  std::map<game::point, game::point> __mapping;
-  game::build_in_data(__map, 1);
-  game::build_in_mapping(__mapping, 1);
-  game::countdown __time = game::build_in_time(1);
+  // std::vector<game::point> __po;
+  // game::matrix<game::base_type> __map;
+  // std::map<game::point, game::point> __mapping;
+  // game::build_in_data(__map, 0);
+  // game::build_in_mapping(__mapping, 0);
+  // game::countdown __time = game::build_in_time(0);
   game::puzzle puzz;
 
   if(
-    puzz.load_data(std::move(__map)) &&
-    puzz.load_time(__time) &&
-    puzz.load_mapping(std::move(__mapping)) &&
-    puzz.load_select(-1)
-    // puzz.load_data("/home/inochi/codes/vscode/Cpp/game-puzzle/output.map")
+    // puzz.load_data(std::move(__map)) &&
+    // puzz.load_time(__time) &&
+    // puzz.load_mapping(std::move(__mapping)) &&
+    // puzz.load_select(-1)
+    puzz.load_file("/home/inochi/codes/vscode/Cpp/game-puzzle/output.map")
   )
-  { puzz.game_play();}
+  { puzz.game_show("/home/inochi/codes/vscode/Cpp/game-puzzle/output");}
 
   return 0;
 }

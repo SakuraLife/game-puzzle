@@ -1,29 +1,31 @@
 #include"solve.h"
-#include"utility.h"
 #include"keyboard.h"
+#include"utility.h"
 #include"check.h"
 #include<queue>
 
 namespace game
 {
 
-  static void draw_solve_path(
-    const matrix<base_type>& __map, const vector<point>& __rec
-  )
+  static void draw_solve_path(const vector<point>& __rec)
   {
-    matrix<base_type> __use(__map);
-    for(const auto& __tmp : __rec)
-    { __use.at(__tmp.x, __tmp.y) = puzz_write;}
-    __use.at(__rec.front().x, __rec.front().y) = puzz_start;
-    __use.at(__rec.back().x, __rec.back().y) = puzz_dest;
-    draw_matrix(__use);
-    printf("\n");
+    printf("%lu\n", __rec.size());
+    unsigned long __use = 0;
+    for(const point& __tmp : __rec)
+    {
+      printf("%lu %lu ", __tmp.x, __tmp.y);
+      ++__use;
+      if((__use & 0x7U) == 0)
+      { printf("\n");}
+    }
+    printf("\n\n");
   }
 
   namespace __detail
   {
     static void __fill_map(
       const matrix<base_type>& __map, matrix<long>& __filled,
+    const std::map<point, point>& __mapping,
       unsigned long __r, unsigned long __c
     )
     {
@@ -43,21 +45,31 @@ namespace game
 
         for(unsigned long __i = 0; __i != 4; ++__i)
         {
-          const unsigned long __trow = static_cast<long>(__now.__x)+x_dic[__i];
-          const unsigned long __tcol = static_cast<long>(__now.__y)+y_dic[__i];
-          if(check_not_out(__trow, __tcol, __map) &&
-            check_is_passage(__map.at(__trow, __tcol)))
+          const unsigned long __tx = static_cast<long>(__now.__x)+x_dic[__i];
+          const unsigned long __ty = static_cast<long>(__now.__y)+y_dic[__i];
+          if(check_not_out(__tx, __ty, __map) &&
+            check_is_passage(__map.at(__tx, __ty)))
           {
-            if(check_is_transport(__map.at(__trow, __tcol)))
+            if((__filled.at(__tx, __ty) == -1 ||
+             __filled.at(__tx, __ty) > __now.__step+1))
             {
-              ;
+              if(check_is_transport(__map.at(__tx, __ty)))
+              {
+                __filled.at(__tx, __ty) = __now.__step+1;
+                point __tmp = __mapping.find(point{__tx, __ty})->second;
+                if(__filled.at(__tmp.x, __tmp.y) == -1 ||
+                 __filled.at(__tmp.x, __tmp.y) > __now.__step+1)
+                {
+                  __filled.at(__tmp.x, __tmp.y) = __now.__step+1;
+                  __queue.push(__point{__tmp.x, __tmp.y, __now.__step+1});
+                }
+              }
+              else
+              {
+                __filled.at(__tx, __ty) = __now.__step+1;
+                __queue.push(__point{__tx, __ty, __now.__step+1});
+              }
             }
-            // if((__filled.at(__trow, __tcol) == -1 ||
-            //  __filled.at(__trow, __tcol) > __now.__step+1))
-            // {
-            //   __queue.push(__point{__trow, __tcol, __now.__step+1});
-            //   __filled.at(__trow, __tcol) = __now.__step+1;
-            // }
           }
         }
 
@@ -66,6 +78,7 @@ namespace game
 
     static void __find_all(
       const matrix<base_type>& __map,
+      const std::map<point, point>& __mapping,
       const unsigned long __res, const matrix<long>& __filled,
       vector<point>& __porec,
       unsigned long __r, unsigned long __c
@@ -75,11 +88,10 @@ namespace game
 
       if(__map.at(__r, __c) == puzz_dest)
       {
-        reflush_screen();
-        draw_solve_path(__map, __porec);
-        keyboard::keyboard_one_step();
+        draw_solve_path(__porec);
         return;
       }
+
       if(__porec.size() == __res)
       { return;}
 
@@ -87,15 +99,28 @@ namespace game
 
       for(unsigned long __i = 0; __i != 4; ++__i)
       {
-        const unsigned long __trow = static_cast<long>(__r)+x_dic[__i];
-        const unsigned long __tcol = static_cast<long>(__c)+y_dic[__i];
+        const unsigned long __tx = static_cast<long>(__r)+x_dic[__i];
+        const unsigned long __ty = static_cast<long>(__c)+y_dic[__i];
 
-        if(check_not_out(__trow, __tcol, __map) &&
-          __filled.at(__r, __c) + 1 == __filled.at(__trow, __tcol)
+        if(check_not_out(__tx, __ty, __map) &&
+          __filled.at(__r, __c) + 1 == __filled.at(__tx, __ty)
         )
         {
-          __porec.push_back(point{__trow, __tcol});
-          __find_all(__map, __res, __filled, __porec, __trow, __tcol);
+          __porec.push_back(point{__tx, __ty});
+          if(check_is_transport(__map.at(__tx, __ty)))
+          {
+            const point __tmp =
+              __mapping.find(point{__tx, __ty})->second;
+            __find_all(
+              __map, __mapping, __res, __filled, __porec, __tmp.x, __tmp.y
+            );
+          }
+          else
+          {
+            __find_all(
+              __map, __mapping, __res, __filled, __porec, __tx, __ty
+            );
+          }
           __porec.pop_back();
         }
       }
@@ -137,7 +162,7 @@ namespace game
       unsigned long __res;
       matrix<long> __record(__map.row(), __map.col());
       __record.init(-1);
-      __detail::__fill_map(__map, __record, __po.x, __po.y);
+      __detail::__fill_map(__map, __record, __mapping, __po.x, __po.y);
 
       __res = __detail::__find_min_dest(__map, __record);
       if(__res == 0)
@@ -147,7 +172,7 @@ namespace game
       vector<point> __porec;
       __porec.push_back(point{__po.x, __po.y});
       __detail::__find_all(
-        __map, 0xffffffffUL,__record, __porec, __po.x, __po.y
+        __map, __mapping, 0xffffffffUL, __record, __porec, __po.x, __po.y
       );
     }
 
@@ -169,8 +194,15 @@ namespace game
       unsigned long __res;
       matrix<long> __record(__map.row(), __map.col());
       __record.init(-1);
-      __detail::__fill_map(__map, __record, __po.x, __po.y);
-
+      __detail::__fill_map(__map, __record, __mapping, __po.x, __po.y);
+#ifndef NDEBUG
+      for(unsigned long __i = 0; __i != __record.row(); ++__i)
+      {
+        for(unsigned long __j = 0; __j != __record.col(); ++__j)
+        { printf("%3ld ", __record.at(__i, __j));}
+        printf("\n");
+      }
+#endif // ! NDEBUG
       __res = __detail::__find_min_dest(__map, __record);
       if(__res == 0)
       { continue;}
@@ -179,7 +211,7 @@ namespace game
       vector<point> __porec;
       __porec.push_back(point{__po.x, __po.y});
       __detail::__find_all(
-        __map, __res+1, __record, __porec, __po.x, __po.y
+        __map, __mapping, __res+1, __record, __porec, __po.x, __po.y
       );
     }
     return __sum;

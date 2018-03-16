@@ -25,6 +25,9 @@ namespace game
            __col > 0 && __col < __map.col();
   }
 
+  bool check_is_dest(base_type __step) noexcept
+  { return __step == puzz_dest;}
+
   bool check_is_transport(base_type __step) noexcept
   { return __step == puzz_tran;}
 

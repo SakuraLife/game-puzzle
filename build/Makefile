@@ -23,14 +23,17 @@ all: $(TARGETLIBS)
 libkeyboard.so libcheck.so libmap_operation.so libutility.so: lib%.so: %.o
 	$(CC) -shared -o $@ $<
 
-libpuzzle.so: puzzle.o libutility.so libcheck.so libmap_operation.so libsolve.so libmain.so
-	$(CC) -shared $(LIBSEARCH) -o libpuzzle.so puzzle.o -lutility -lcheck -lmap_operation -lsolve -lmain -lpthread
+libpuzzle.so: puzzle.o libutility.so libcheck.so libmap_operation.so libsolve.so libmain.so libanalyze.so
+	$(CC) -shared $(LIBSEARCH) -o libpuzzle.so puzzle.o -lutility -lcheck -lmap_operation -lsolve -lanalyze -lmain -lpthread
 
 libbuildin:
 	make -C ../buildin
 
 libdefdata.so: defdata.o libbuildin
 	$(CC) -shared $(LIBSEARCH) -o libdefdata.so defdata.o $(DEFDATADEPEND)
+
+libanalyze.so: analyze.o libcheck.so
+	$(CC) -shared $(LIBSEARCH) -o libanalyze.so analyze.o -lcheck
 
 libmain.so libsolve.so: lib%.so: %.o libutility.so libkeyboard.so libcheck.so
 	$(CC) -shared $(LIBSEARCH) -o $@ $< -lkeyboard -lcheck -lutility

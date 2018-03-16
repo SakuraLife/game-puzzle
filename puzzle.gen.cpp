@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
   unsigned long __in = 0;
   game::puzzle puzz;
-  if(puzz.load_data(argv[1]))
+  if(puzz.load_file(argv[1]))
   {
     print_header(__in);
     print_map_data_header(__in);

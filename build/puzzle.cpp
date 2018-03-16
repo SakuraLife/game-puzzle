@@ -4,6 +4,8 @@
 #include"map_operation.h"
 #include"solve.h"
 #include"main.h"
+#include"analyze.h"
+#include"keyboard.h"
 #include<thread>
 #include<utility>
 #include<cstdlib>
@@ -16,7 +18,7 @@ namespace game
   puzzle::~puzzle()
   { }
 
-  bool puzzle::load_data(const char* __str)
+  bool puzzle::load_file(const char* __str)
   {
     using std::FILE;
     using std::fopen;
@@ -26,7 +28,7 @@ namespace game
     FILE* __file = fopen(__str, "r");
     if(__file == nullptr)
     {
-      fprintf(stderr, "Error when open the file:%s", __str);
+      fprintf(stderr, "Error when opening the file:%s", __str);
       return false;
     }
     unsigned long __r, __c;
@@ -146,7 +148,7 @@ namespace game
 
 namespace game
 {
-  void puzzle::game_play()
+  void puzzle::game_play() const
   {
     using std::printf;
 
@@ -166,7 +168,7 @@ namespace game
       __st_po, this->__select, __now.__pos.x, __now.__pos.y
     );
 
-    init_position(__map.__data, __now);
+    init_position(__map.__data, __now.__pos);
     reflush_screen();
     draw_play_matrix(__map, __now, __clock);
 
@@ -189,14 +191,9 @@ namespace game
     { __thread2.join();}
 
   }
-  void puzzle::game_solve()
+  void puzzle::game_solve() const
   {
     using std::printf;
-
-    reflush_screen();
-    printf("This is the map:\n");
-    draw_matrix(this->__data);
-    printf("\n");
 
     bool __res = find_all_shortest_path(this->__data, this->__mapping);
     if(!__res)
@@ -205,14 +202,9 @@ namespace game
       return;
     }
   }
-  void puzzle::game_solve_all()
+  void puzzle::game_solve_all() const
   {
     using std::printf;
-
-    reflush_screen();
-    printf("This is the map:\n");
-    draw_matrix(this->__data);
-    printf("\n");
 
     bool __res = find_all_path(this->__data, this->__mapping);
     if(!__res)
@@ -220,6 +212,42 @@ namespace game
       printf("There is no path for the game.\n");
       return;
     }
+  }
+
+  void puzzle::game_show(const char* __fname)
+  {
+    using std::printf;
+    using std::fopen;
+    using std::fclose;
+    using std::fscanf;
+    using std::fprintf;
+
+    FILE* __file = fopen(__fname, "r");
+    if(__file == nullptr)
+    {
+      fprintf(stderr, "Error when opening the file:%s", __fname);
+      return;
+    }
+    unsigned long __num;
+    unsigned long __x, __y;
+    vector<point> __po;
+    game_postion __now;
+    fscanf(__file, "%lu", &__num);
+    for(unsigned long __i = 0; __i != __num; ++__i)
+    {
+      if(fscanf(__file, "%lu%lu", &__x, &__y) != 2)
+      {
+        fprintf(stderr, "Error when reading the file:%s", __fname);
+        return;
+      }
+      __po.push_back(point{__x, __y});
+    }
+
+    __now.x = __po.front().x;
+    __now.y = __po.front().y;
+    vector<keyboard::keyboard_mapping> __rec;
+    analyze_point_trace(this->__data, this->__mapping, __po, __rec);
+    show_puzzle_trace(this->__data, __now, this->__mapping, __rec);
   }
 
   const puzzle::data_type& puzzle::map_data() const noexcept
