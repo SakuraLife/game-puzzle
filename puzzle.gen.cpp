@@ -4,12 +4,12 @@
 
 namespace
 {
-  void print_header(unsigned long __in) noexcept
+  void print_header(unsigned long in) noexcept
   {
     using std::printf;
 
-    printf("#ifndef __PUZZ_DEFAULT_MAP_%lu__\n", __in);
-    printf("#define __PUZZ_DEFAULT_MAP_%lu__\n", __in);
+    printf("#ifndef __PUZZ_DEFAULT_MAP_%lu__\n", in);
+    printf("#define __PUZZ_DEFAULT_MAP_%lu__\n", in);
     printf("\n");
     printf("#include\"puzzle_fwd.hpp\"\n");
     printf("\n");
@@ -18,32 +18,32 @@ namespace
     printf("{\n");
     printf("  namespace build_in\n");
     printf("  {\n");
-    printf("    void map_%lu_data(matrix<game::base_type>& __map);\n", __in);
-    printf("    countdown map_%lu_time() noexcept;\n", __in);
-    printf("    void map_%lu_mapping(std::map<point, point>& __mapping);\n", __in);
+    printf("    void map_%lu_data(matrix<game::base_type>& __map);\n", in);
+    printf("    countdown map_%lu_time() noexcept;\n", in);
+    printf("    void map_%lu_mapping(std::map<point, point>& __mapping);\n", in);
     printf("  }\n");
     printf("}\n");
     printf("\n");
-    printf("#endif // ! __PUZZ_DEFAULT_MAP_%lu__\n", __in);
+    printf("#endif // ! __PUZZ_DEFAULT_MAP_%lu__\n", in);
     printf("\n");
   }
 
-  void print_map_data_header(unsigned long __in) noexcept
+  void print_map_data_header(unsigned long in) noexcept
   {
     using std::printf;
 
-    printf("#include\"map_%lu.h\"\n", __in);
+    printf("#include\"map_%lu.h\"\n", in);
     printf("\n\n");
 
   }
   void print_map_data(
-    const game::matrix<game::base_type>& __map, unsigned long __in
+    const game::matrix<game::base_type>& __map, unsigned long in
   ) noexcept
   {
     using std::printf;
     printf(
       "void game::build_in::map_%lu_data(matrix<game::base_type>& __map)\n",
-      __in
+      in
     );
     printf("{\n");
     printf("  __map.resize(%4lu, %4lu);\n", __map.row(), __map.col());
@@ -94,14 +94,14 @@ namespace
   }
 
   void print_map_time(
-    const game::countdown& __now, unsigned long __in
+    const game::countdown& __now, unsigned long in
   ) noexcept
   {
     using std::printf;
 
     printf(
       "game::countdown game::build_in::map_%lu_time() noexcept\n",
-      __in
+      in
     );
     printf(
       "{ return game::countdown{%hu, %hu, %hu};}\n",
@@ -111,14 +111,14 @@ namespace
   }
   void print_map_mapping(
     const std::map<game::point, game::point>& __mapping,
-    unsigned long __in
+    unsigned long in
   ) noexcept
   {
     using std::printf;
 
     printf(
       "void game::build_in::map_%lu_mapping(std::map<point, point>& __mapping)\n",
-      __in
+      in
     );
     printf("{\n");
     for(const std::pair<const game::point, game::point>& __tmp: __mapping)
@@ -141,15 +141,15 @@ int main(int argc, char* argv[])
   if(argc != 2)
   { return 0;}
 
-  unsigned long __in = 0;
+  unsigned long in = 0;
   game::puzzle puzz;
   if(puzz.load_file(argv[1]))
   {
-    print_header(__in);
-    print_map_data_header(__in);
-    print_map_data(puzz.map_data(), __in);
-    print_map_time(puzz.time_data(), __in);
-    print_map_mapping(puzz.mapping_data(), __in);
+    print_header(in);
+    print_map_data_header(in);
+    print_map_data(puzz.map_data(), in);
+    print_map_time(puzz.time_data(), in);
+    print_map_mapping(puzz.mapping_data(), in);
   }
 
   return 0;

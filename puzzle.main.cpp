@@ -1,6 +1,8 @@
 #include"build/puzzle.h"
 #include"build/defdata.h"
 #include<cstdio>
+#include<cstring>
+#include<cstdlib>
 #include<map>
 
 // #include"./build/check.h"
@@ -27,128 +29,195 @@
 // #include"./buildin/map_0.cpp"
 // #include"./buildin/map_1.cpp"
 
-// namespace
-// {
-//   [[unused]] void puzz_help() noexcept
-//   {
-//     using ::std::printf;
+namespace
+{
+  struct puzz_args
+  {
+    bool play;
+    bool solve;
+    bool solve_all;
+    bool build_in;
+    bool edit;
+    bool help;
+    bool show;
+    unsigned long which;
+    const char* file;
+    const char* solve_file;
+  };
 
-//     printf("Usage:\n");
-//     printf("puzzle.main [-p][-s][-e][-h] <PATH>\n\n");
+  void puzz_help() noexcept
+  {
+    using ::std::printf;
 
-//     printf("  -p [<path>]\tplay the game with map file, deafault with\n  \t\t  build-in maps.\n");
-//     printf("  -s [<path>]\tsolve the game with map file, deafault with\n  \t\t  build-in maps.\n");
-//     printf("  -e <path>\tedit the map file.\n");
-//     printf("  -h\t\tprint this help.\n");
-//     printf("  -v\t\tprint the author information.\n");
-//   }
+    printf("Usage:\n");
+    printf("puzzle.main [-b][-p][-s][-e][-h] <PATH>\n\n");
 
-//   [[unused]] void author_inf() noexcept
-//   {
-//     using ::std::printf;
+    printf("  -b [num]\tuse build in data.\n");
+    printf("  -p [<path>]\tplay the game\n");
+    printf("  -s [<path>]\tsolve the game\n");
+    printf("  -e <path>\tedit the map file.\n");
+    printf("  -d <path> [<path>]\tplay the game use trace files\n");
+    printf("  -h\t\tprint this help.\n");
+    printf("\nPlease type -b first if you what use build in data.\n");
+    // printf("  -v\t\tprint the author information.\n");
+  }
 
-//     printf("Created by Inochi Amaoto.\n");
-//   }
+  void author_inf() noexcept
+  {
+    using std::printf;
+    printf("Created by Inochi Amaoto.\n");
+  }
 
-  // void puzz_information() noexcept
-  // {
-  //   using std::printf;
+  void puzz_information() noexcept
+  {
+    using std::printf;
 
-  //   printf("This is the symbol information.\n");
+    printf("This is the symbol information.\n");
 
-  //   printf("  0\t\tthe start postion.\n  \t\tThe game starts from one of them.\n\n");
-  //   printf("  1\t\tthe destination postion.\n  \t\tThe game ends if you reach one of them.\n\n");
-  //   printf("  #\t\tthe wall.\n  \t\tYou can't pass it at the most time, \n  \t\tbut there are some special walls that you can pass\n\n");
-  //   printf("  -\t\tthe pass.\n  \t\tYou can pass it at the most time,\n  \t\tbut if it's a trap, you can't pass it.\n\n");
-  //   printf("  +\t\tthe transport postion.\n  \t\tYou will be transported to a new postion when you reach.\n");
-  // }
+    printf("  0\t\tthe start postion.\n  \t\tThe game starts from one of them.\n\n");
+    printf("  1\t\tthe destination postion.\n  \t\tThe game ends if you reach one of them.\n\n");
+    printf("  #\t\tthe wall.\n  \t\tYou can't pass it at the most time, \n  \t\tbut there are some special walls that you can pass\n\n");
+    printf("  -\t\tthe pass.\n  \t\tYou can pass it at the most time,\n  \t\tbut if it's a trap, you can't pass it.\n\n");
+    printf("  +\t\tthe transport postion.\n  \t\tYou will be transported to a new postion when you reach.\n");
+  }
 
-// }
+  void analyze_args(int argc, char* argv[], puzz_args& args)
+  {
+    using std::fprintf;
+    using std::strtoul;
+    using std::exit;
+
+    for(int __i = 1; __i < argc; ++__i)
+    {
+      if(argv[__i][0] == '-')
+      {
+        switch(argv[__i][1])
+        {
+          case 'h':
+            args.help = true;
+            break;
+          case 'b':
+            args.build_in = true;
+            ++__i;
+            args.which = strtoul(argv[__i], nullptr, 10);
+            break;
+          case 'p':
+            args.play = true;
+            if(!args.build_in)
+            {
+              ++__i;
+              args.file = argv[__i];
+            }
+            break;
+          case 's':
+            args.solve = true;
+            if(!args.build_in)
+            {
+              ++__i;
+              args.file = argv[__i];
+            }
+            break;
+          case 'd':
+            args.show = true;
+            ++__i;
+            args.solve_file = argv[__i];
+            if(!args.build_in)
+            {
+              ++__i;
+              args.file = argv[__i];
+            }
+            break;
+          case 'e':
+            args.edit = true;
+            ++__i;
+            args.file = argv[__i];
+            break;
+          default:
+            fprintf(stderr, "Unknown args - %c\n", argv[__i][1]);
+            puzz_help();
+            printf("\n");
+            puzz_information();
+            printf("\n");
+            author_inf();
+            exit(EXIT_FAILURE);
+        }
+      }
+    }
+  }
+}
 
 int main(int argc, char* argv[])
 {
   using std::printf;
+  using std::memset;
 
-  // if(argc == 1 || argc > 3)
-  // {
-  //   help_error:
-  //     puzz_help();
-  //     printf("\n");
-  //     author_inf();
-  //     return 0;
-  // }
+  puzz_args args;
+  memset(&args, 0x00, sizeof(args));
+  if(argc == 1)
+  { goto laber_help;}
+  analyze_args(argc, argv, args);
 
-  // game::puzzle puzz;
+  if(args.help)
+  {
+    laber_help:
+      puzz_help();
+      printf("\n");
+      puzz_information();
+      printf("\n");
+      author_inf();
+      return 0;
+  }
 
-  // if(argc == 2)
-  // {
-  //   if(argv[1][0] != '-')
-  //   { goto help_error;}
-  //   switch(argv[1][1])
-  //   {
-  //     case 'h':
-  //       puzz_help();
-  //       printf("\n");
-  //     case 'v':
-  //       author_inf();
-  //       break;
-  //     case 'p':
-  //       if(puzz.load_data(game::default_data(0)) && puzz.load_time(0, 1, 0))
-  //       { puzz.game_play();}
-  //       break;
-  //     case 's':
-  //       if(puzz.load_data(game::default_data(0)))
-  //       { puzz.game_solve();}
-  //       break;
-  //     case 'e':
-  //     default:
-  //       printf("Unknown options: -%c\n\n", argv[1][1]);
-  //       goto help_error;
-  //   }
-  //   return 0;
-  // }
-  // if(argv[1][0] != '-')
-  // { goto help_error;}
-  // switch(argv[1][1])
-  // {
-  //   case 'h':
-  //     puzz_help();
-  //     printf("\n");
-  //   case 'v':
-  //     author_inf();
-  //     break;
-  //   case 'p':
-  //     if(puzz.load_data(argv[2]))
-  //     { puzz.game_play();}
-  //     break;
-  //   case 's':
-  //     if(puzz.load_data(argv[2]))
-  //     { puzz.game_solve();}
-  //     break;
-  //   case 'e':
-  //     game::puzzle::game_edit(argv[2]);
-  //     break;
-  //   default:
-  //     printf("Unknown options: -%c\n\n", argv[1][1]);
-  //     goto help_error;
-  // }
+  if(args.edit)
+  {
+    if(args.file == nullptr)
+    { args.file = "default.map";}
+    game::puzzle::game_edit(args.file);
+    return 0;
+  }
 
-  // std::vector<game::point> __po;
-  // game::matrix<game::base_type> __map;
-  // std::map<game::point, game::point> __mapping;
-  // game::build_in_data(__map, 0);
-  // game::build_in_mapping(__mapping, 0);
-  // game::countdown __time = game::build_in_time(0);
   game::puzzle puzz;
+  bool __load = false;
+  if(args.build_in)
+  {
+    std::vector<game::point> __po;
+    game::matrix<game::base_type> __map;
+    std::map<game::point, game::point> __mapping;
+    game::build_in_data(__map, args.which);
+    game::build_in_mapping(__mapping, args.which);
+    __load = puzz.load_data(std::move(__map)) &&
+             puzz.load_time(game::build_in_time(args.which)) &&
+             puzz.load_mapping(std::move(__mapping)) &&
+             puzz.load_select(-1);
+  }
+  else
+  {
+    if(args.file == nullptr)
+    { goto file_error;}
+    __load = puzz.load_file(args.file);
+  }
+  if(!__load)
+  {
+    file_error:
+      fprintf(stderr, "Error when load data.\n");
+      return EXIT_FAILURE;
+  }
 
-  if(
-    // puzz.load_data(std::move(__map)) &&
-    // puzz.load_time(__time) &&
-    // puzz.load_mapping(std::move(__mapping)) &&
-    // puzz.load_select(-1)
-    puzz.load_file("/home/inochi/codes/vscode/Cpp/game-puzzle/output.map")
-  )
-  { puzz.game_show("/home/inochi/codes/vscode/Cpp/game-puzzle/output");}
+  if(args.play)
+  {
+    puzz.game_play();
+    return 0;
+  }
+  if(args.solve)
+  {
+    puzz.game_solve();
+    return 0;
+  }
+  if(args.show)
+  {
+    puzz.game_show(args.solve_file);
+    return 0;
+  }
 
   return 0;
 }
