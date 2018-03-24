@@ -10,7 +10,7 @@ SOURCE := $(wildcard *.cpp)
 OBJECTS := $(foreach tmp,$(SOURCE),$(subst .cpp,.o,$(tmp)))
 DEPENDS := $(foreach tmp,$(SOURCE),$(subst .cpp,.d,$(tmp)))
 TARGETLIBS := $(foreach tmp,$(SOURCE),$(addprefix lib, $(subst .cpp,.so,$(tmp))))
-DEFDATADEPEND := $(foreach tmp,$(wildcard ../buildin/*.cpp),$(addprefix -l, $(subst ../buildin/,, $(subst .cpp,,$(tmp)))))
+DEFDATADEPEND := -lmap
 DEBUGARG =
 
 ifeq ($(NDEBUG),1)

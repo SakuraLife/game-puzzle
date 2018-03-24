@@ -25,7 +25,7 @@ namespace game
   {
     static void __fill_map(
       const matrix<base_type>& __map, matrix<long>& __filled,
-    const std::map<point, point>& __mapping,
+      const std::map<point, point>& __mapping,
       unsigned long __r, unsigned long __c
     )
     {

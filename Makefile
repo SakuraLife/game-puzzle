@@ -11,7 +11,6 @@ SEARCH = -Wl,-rpath,'$$ORIGIN'
 OBJECT := puzzle.gen.o puzzle.main.o
 TARGET := puzzle.gen puzzle.main
 DEPENDS := puzzle.gen.d puzzle.main.d
-DEFDATADEPEND := $(foreach tmp,$(wildcard ./buildin/*.cpp),$(addprefix -l, $(subst ./buildin/,, $(subst .cpp,,$(tmp)))))
 NDEBUG =
 ifndef DESTDIR
 	DESTDIR := ./install
@@ -56,10 +55,9 @@ include $(DEPENDS)
 install:
 	mkdir -p "${DESTDIR}"
 	mkdir -p "${DESTDIR}/libpuzzle"
-	mkdir -p "${DESTDIR}/libpuzzle/maps"
 	cp $(TARGET) "${DESTDIR}"
 	cp ./build/*.so "${DESTDIR}/libpuzzle"
-	cp ./buildin/*.so "${DESTDIR}/libpuzzle/maps"
+	cp ./buildin/*.so "${DESTDIR}/libpuzzle"
 
 chclean:
 	@$(MAKE) -C ./build chclean

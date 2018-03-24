@@ -8,14 +8,14 @@ namespace game
   {
     unsigned long x;
     unsigned long y;
-  };
 
-  bool operator<(const point& __x, const point& __y) noexcept
-  {
-    if(__x.x == __y.x)
-    { return __x.y < __y.y;}
-    return __x.x < __y.x;
-  }
+    bool operator<(const point& other) const noexcept
+    {
+      if(this->x == other.x)
+      { return this->y < other.y;}
+      return this->x < other.y;
+    }
+  };
 
   struct countdown
   {

@@ -8,10 +8,10 @@ LIBSEARCH = -L./ -L../build
 SOURCE := $(wildcard *.cpp)
 OBJECTS := $(foreach tmp,$(SOURCE),$(subst .cpp,.o,$(tmp)))
 DEPENDS := $(foreach tmp,$(SOURCE),$(subst .cpp,.d,$(tmp)))
-TARGET := $(foreach tmp,$(SOURCE),$(addprefix lib, $(subst .cpp,.so,$(tmp))))
+TARGET := libmap.so
 HEADERS := $(wildcard *.h)
 
-all: pre $(TARGET)
+all: pre libmap.so
 	@cat /dev/null > ./build_in.hpp
 	@$(foreach tmp, $(HEADERS), echo "#include\"${tmp}\"" >> ./build_in.hpp;)
 
@@ -25,8 +25,8 @@ all: pre $(TARGET)
 pre:
 	@$(MAKE) -C ../build libmap_operation.so
 
-$(TARGET): lib%.so: %.o
-	$(CC) $(LIBSEARCH) -shared -o $@ $< -lmap_operation
+libmap.so: $(OBJECTS)
+	$(CC) $(LIBSEARCH) -shared -o libmap.so $(OBJECTS) -lmap_operation
 
 include $(DEPENDS)
 
@@ -34,7 +34,6 @@ include $(DEPENDS)
 
 chclean:
 	-rm $(OBJECTS)
-	-rm -r ./libpuzzle
 	-rm $(DEPENDS)
 
 clean: chclean
